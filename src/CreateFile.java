@@ -1,8 +1,8 @@
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
-public class BoardFile {
+
+public class CreateFile {
     public static void createFileIfNotExists() {
         File file = new File("src/maze.txt");
         if (!file.exists()) {
@@ -13,9 +13,15 @@ public class BoardFile {
             }
         }
     }
+
+
+
+
     public static void main(String[] args) {
         createFileIfNotExists();
     }
+
+
 
 
 
