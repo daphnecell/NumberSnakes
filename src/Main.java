@@ -1,23 +1,23 @@
-import java.util.LinkedList;
+import enigma.core.Enigma;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        LinkedList<String> myList = new LinkedList<>();
+    private static char lastInput = ' ';
+    public static void main(String[] args)  {
+        enigma.console.Console cn = Enigma.getConsole("snake");
+        Maze maze = new Maze("C:\\Users\\ARDA-PC\\IdeaProjects\\pbl2.2\\src\\maze.txt");
+        Scanner scanner = new Scanner(System.in);
 
-        myList.add("A");
-        myList.add("B");
-        myList.add("C");
+        while (true) {
+            maze.printMaze();
+            System.out.println("Hareket için W/A/S/D tuşla:");
 
-        System.out.println(myList); // [A, B, C]
+            char input = scanner.nextLine().toUpperCase().charAt(0);
 
-        myList.addFirst("Start");
-        myList.addLast("End");
-
-        System.out.println(myList); // [Start, A, B, C, End]
-
-        myList.remove("B");
-        System.out.println(myList); // [Start, A, C, End]
-
-
+            maze.movePlayer(input);
+        }
     }
 }
