@@ -2,8 +2,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import enigma.core.Enigma;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Random;
 
 public class InputQueue {
+    public static boolean game_over = false;
+
+    Random random = new Random();
+
     static int per_treasure1 = 50;
     static int per_treasure2 = 25;
     static int per_treasure3 = 13;
@@ -51,23 +59,84 @@ public class InputQueue {
         while (!input.isEmpty()){
             inputQueue.enqueue(input.remove());
         }
+    }
+
+
+    //this method prints the input queue to the console
+    public static void printInputQueueToBoard(CircularQueue inputQueue, enigma.console.Console cn) {
+        int size = inputQueue.size();
+        int count = 1;
+        int index = 0;
+        cn.getTextWindow().setCursorPosition(57, 2);
+        cn.getTextWindow().output("Input: ");
+        cn.getTextWindow().setCursorPosition(57, 3);
+        cn.getTextWindow().output("<<<<<<<<<<<<<<<");
+        for (int i = 0; i < size; i++) {
+            if (count <= 15) { //only the first 15 elements on queue will show up on console
+                String current = (String) inputQueue.dequeue();
+                cn.getTextWindow().setCursorPosition(57 + index, 4);
+                cn.getTextWindow().output(current);
+                inputQueue.enqueue(current);
+                count++;
+                index++;
+            }
+            else { // to not break the order of input queue.
+                inputQueue.enqueue(inputQueue.dequeue());
+            }
+        }
+        cn.getTextWindow().setCursorPosition(57, 5);
+        cn.getTextWindow().output("<<<<<<<<<<<<<<<");
+    }
+
+    private static void printTreasure(enigma.console.Console cn, CircularQueue inputQueue,java.util.Random random) {
+        int x = 2;
+        int y = 2;
+        Boolean coordination_is_empty = false;
+        while (!coordination_is_empty) {
+            x = random.nextInt(53) + 2;
+            y = random.nextInt(21) + 2;
+            if (Maze.maze[y][x] == ' '){
+                coordination_is_empty = true;
+            }
+        }
+        char current = (char) inputQueue.dequeue();
+        Maze.maze[y][x] = current;
+        inputQueue.enqueue(current);
+    }
+
+    public static void printTreasuresToBoard(enigma.console.Console cn,java.util.Random random , CircularQueue inputQueue) {
+        //şimdi random koordinat seçmesi lazım her seferinde ve seçtiği koordinatın uygun olup olmadığından emin olacak
+        //yani o indekste hiçbişi yazmio olması lazım ona göre belli sürede bir bastırcak işte
+        //random x
+        //random y
+        //Maze.maze[3][4] = 'k'; böyle kullancaz maze classından maze'i çekçez
+
+        Timer timer = new Timer();
+        while (!game_over){
+            TimerTask printTreasure = new TimerTask() {
+                @Override
+                public void run() {
+                    printTreasure(cn,inputQueue,random);
+                }
+            };
+            timer.scheduleAtFixedRate(printTreasure, 0, 2000); //2 snde bir
+        }
+
 
     }
 
-    public static void printInputQueueToBoard(){
-
-    }
-
-    public static void printTreasuresToBoard(){
-
-    }
 
 
 
     public static void main(String[] args) {
+        Random random = new Random();
+        enigma.console.Console cn = Enigma.getConsole("inputqueue");
         LinkedList<String> input = new LinkedList<>();
         CircularQueue inputQueue = new CircularQueue(100);
         createInputQueue(per_treasure1,per_treasure2,per_treasure3, per_treasureAD, per_treasureS, input, inputQueue);
+        printInputQueueToBoard(inputQueue, cn);
+        printTreasuresToBoard(cn,random,inputQueue);
+
     }
 
 }

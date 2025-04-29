@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Maze {
-    private char[][] maze;
+    public static char[][] maze; //bohohoyt lazım da hehe
     private int playerX;
     private int playerY;
 
