@@ -1,17 +1,19 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
+
+import enigma.core.Enigma;
 
 public class Maze {
-    public static char[][] maze; //bohohoyt lazım da hehe
+    private char[][] maze;
     private int playerX;
     private int playerY;
+    private enigma.console.Console cn = Enigma.getConsole("Maze Game");
 
     public Maze(String path) {
         maze = new char[23][55];
-        playerX = 11; // Başlangıç X
-        playerY = 27; // Başlangıç Y
+        playerX = 11;
+        playerY = 27;
         loadMaze(path);
     }
 
@@ -34,14 +36,16 @@ public class Maze {
         for (int i = 0; i < 23; i++) {
             for (int j = 0; j < 55; j++) {
                 if (i == playerX && j == playerY) {
-                    System.out.print('@'); // Oyuncu burada
+                    System.out.print('@');
                 } else {
                     System.out.print(maze[i][j]);
                 }
             }
             System.out.println();
         }
+
     }
+
 
     public void movePlayer(char direction) {
         int newX = playerX;
@@ -53,16 +57,26 @@ public class Maze {
             case 'A': newY--; break;
             case 'D': newY++; break;
             default:
-                System.out.println("Geçersiz tuş!");
+                System.out.println("Geçersiz tuş");
                 return;
         }
 
-        // Sınır kontrolü
-        if (newX >= 0 && newX < 23 && newY >= 0 && newY < 55 && maze[newX][newY] != '#') {
+
+        if (newX >= 0 && newX < 25 && newY >= 0 && newY < 57 && maze[newX][newY] != '#') {
+
+
+            cn.getTextWindow().output(playerY, playerX, ' ');
+
+
             playerX = newX;
             playerY = newY;
-        } else {
-            System.out.println("Gidemezsin oraya!");
+
+
+            cn.getTextWindow().output(playerY, playerX, '@');
+        }
         }
     }
-}
+
+
+
+

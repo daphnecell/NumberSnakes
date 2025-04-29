@@ -1,23 +1,59 @@
 import enigma.core.Enigma;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class Main {
-    private static char lastInput = ' ';
-    public static void main(String[] args)  {
-        enigma.console.Console cn = Enigma.getConsole("snake");
+    public enigma.console.Console cn = Enigma.getConsole("Snake");
+    private KeyListener klis;
+
+    private boolean upPressed = false;
+    private boolean downPressed = false;
+    private boolean leftPressed = false;
+    private boolean rightPressed = false;
+
+    public Main() throws Exception {
         Maze maze = new Maze("C:\\Users\\ARDA-PC\\IdeaProjects\\pbl2.2\\src\\maze.txt");
-        Scanner scanner = new Scanner(System.in);
 
-        while (true) {
+            klis = new KeyListener() {
+
+                public void keyTyped(KeyEvent e) {
+                }
+
+
+                public void keyPressed(KeyEvent e) {
+                    int code = e.getKeyCode();
+                    if (code == KeyEvent.VK_W) upPressed = true;
+                    if (code == KeyEvent.VK_S) downPressed = true;
+                    if (code == KeyEvent.VK_A) leftPressed = true;
+                    if (code == KeyEvent.VK_D) rightPressed = true;
+                }
+
+
+                public void keyReleased(KeyEvent e) {
+                    int code = e.getKeyCode();
+                    if (code == KeyEvent.VK_W) upPressed = false;
+                    if (code == KeyEvent.VK_S) downPressed = false;
+                    if (code == KeyEvent.VK_A) leftPressed = false;
+                    if (code == KeyEvent.VK_D) rightPressed = false;
+                }
+            };
+            cn.getTextWindow().addKeyListener(klis);
+
             maze.printMaze();
-            System.out.println("Hareket için W/A/S/D tuşla:");
 
-            char input = scanner.nextLine().toUpperCase().charAt(0);
+            while (true) {
+                if (upPressed) maze.movePlayer('W');
+                if (downPressed) maze.movePlayer('S');
+                if (leftPressed) maze.movePlayer('A');
+                if (rightPressed) maze.movePlayer('D');
 
-            maze.movePlayer(input);
+                Thread.sleep(200);
+
+
+            }
         }
+
+    public static void main(String[] args) throws Exception {
+        new Main();
     }
 }
