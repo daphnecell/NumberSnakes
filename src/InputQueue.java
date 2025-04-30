@@ -105,11 +105,6 @@ public class InputQueue {
     }
 
     public static void printTreasuresToBoard(enigma.console.Console cn,java.util.Random random , CircularQueue inputQueue) {
-        //şimdi random koordinat seçmesi lazım her seferinde ve seçtiği koordinatın uygun olup olmadığından emin olacak
-        //yani o indekste hiçbişi yazmio olması lazım ona göre belli sürede bir bastırcak işte
-        //random x
-        //random y
-        //Maze.maze[3][4] = 'k'; böyle kullancaz maze classından maze'i çekçez
 
         Timer timer = new Timer();
         while (!game_over){
@@ -119,7 +114,7 @@ public class InputQueue {
                     printTreasure(cn,inputQueue,random);
                 }
             };
-            timer.scheduleAtFixedRate(printTreasure, 0, 2000); //2 snde bir
+            timer.scheduleAtFixedRate(printTreasure, 0, 2000);
         }
 
 

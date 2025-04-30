@@ -8,7 +8,7 @@ public class Main {
     private static char lastInput = ' ';
     public static void main(String[] args)  {
         enigma.console.Console cn = Enigma.getConsole("snake");
-        Maze maze = new Maze("C:\\Users\\ARDA-PC\\IdeaProjects\\pbl2.2\\src\\maze.txt");
+        Maze maze = new Maze("src/maze.txt");
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
