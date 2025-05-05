@@ -12,17 +12,17 @@ public class Game {
     public TextMouseListener tmlis;
     public KeyListener klis;
 
-    // ------ Standard variables for mouse and keyboard ------
-    public int mousepr;          // mouse pressed?
-    public int mousex, mousey;   // mouse text coords.
-    public int keypr;   // key pressed?
-    public int rkey;    // key   (for press/release)
-    // ----------------------------------------------------
+
+    public int mousepr;
+    public int mousex, mousey;
+    public int keypr;
+    public int rkey;
 
 
-    Game() throws Exception {   // --- Contructor
 
-        // ------ Standard code for mouse and keyboard ------ Do not change
+    Game() throws Exception {
+
+
         tmlis=new TextMouseListener() {
             public void mouseClicked(TextMouseEvent arg0) {}
             public void mousePressed(TextMouseEvent arg0) {
@@ -47,19 +47,19 @@ public class Game {
             public void keyReleased(KeyEvent e) {}
         };
         cn.getTextWindow().addKeyListener(klis);
-        // ----------------------------------------------------
+
 
 
         int px=5,py=5;
         cn.getTextWindow().output(px,py,'P');
         while(true) {
-            if(mousepr==1) {  // if mouse button pressed
-                cn.getTextWindow().output(mousex,mousey,'#');  // write a char to x,y position without changing cursor position
+            if(mousepr==1) {
+                cn.getTextWindow().output(mousex,mousey,'#');
                 px=mousex; py=mousey;
 
-                mousepr=0;     // last action
+                mousepr=0;
             }
-            if(keypr==1) {    // if keyboard button pressed
+            if(keypr==1) {
                 if(rkey==KeyEvent.VK_LEFT) px--;
                 if(rkey==KeyEvent.VK_RIGHT) px++;
                 if(rkey==KeyEvent.VK_UP) py--;
@@ -67,17 +67,17 @@ public class Game {
 
                 char rckey=(char)rkey;
                 //        left          right          up            down
-                if(rckey=='%' || rckey=='\'' || rckey=='&' || rckey=='(') cn.getTextWindow().output(px,py,'P'); // VK kullanmadan test teknigi
+                if(rckey=='%' || rckey=='\'' || rckey=='&' || rckey=='(') cn.getTextWindow().output(px,py,'P');
                 else cn.getTextWindow().output(rckey);
 
                 if(rkey==KeyEvent.VK_SPACE) {
                     String str;
-                    str=cn.readLine();     // keyboardlistener running and readline input by using enter
+                    str=cn.readLine();
                     cn.getTextWindow().setCursorPosition(5, 20);
                     cn.getTextWindow().output(str);
                 }
 
-                keypr=0;    // last action
+                keypr=0;
             }
             Thread.sleep(20);
         }

@@ -5,9 +5,9 @@ import java.io.IOException;
 import enigma.core.Enigma;
 
 public class Maze {
-    private char[][] maze;
-    private int playerX;
-    private int playerY;
+    public static char[][] maze;
+    private static int playerX;
+    private static int playerY;
     private enigma.console.Console cn = Enigma.getConsole("Maze Game");
 
     public Maze(String path) {
@@ -32,7 +32,7 @@ public class Maze {
         }
     }
 
-    public void printMaze() {
+    public static void printMaze() {
         for (int i = 0; i < 23; i++) {
             for (int j = 0; j < 55; j++) {
                 if (i == playerX && j == playerY) {
@@ -74,9 +74,5 @@ public class Maze {
 
             cn.getTextWindow().output(playerY, playerX, '@');
         }
-        }
     }
-
-
-
-
+}

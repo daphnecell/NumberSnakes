@@ -12,7 +12,7 @@ public class InputQueue {
 
     Random random = new Random();
 
-    static int per_treasure1 = 50;
+    public static int per_treasure1 = 50;
     static int per_treasure2 = 25;
     static int per_treasure3 = 13;
     static int per_treasureAD = 9;
@@ -88,42 +88,42 @@ public class InputQueue {
         cn.getTextWindow().output("<<<<<<<<<<<<<<<");
     }
 
-    private static void printTreasure(enigma.console.Console cn, CircularQueue inputQueue,java.util.Random random) {
+    private static void printTreasure(enigma.console.Console cn, CircularQueue inputQueue, java.util.Random random) {
         int x = 2;
         int y = 2;
-        Boolean coordination_is_empty = false;
+        boolean coordination_is_empty = false;
         while (!coordination_is_empty) {
             x = random.nextInt(53) + 2;
             y = random.nextInt(21) + 2;
-            if (Maze.maze[y][x] == ' '){
+            if (Maze.maze[y][x] == ' ') {
                 coordination_is_empty = true;
             }
         }
-        char current = (char) inputQueue.dequeue();
+        String dequeued = (String) inputQueue.dequeue();
+        char current = dequeued.charAt(0);
+        // Maze içeriğini güncelle
         Maze.maze[y][x] = current;
-        inputQueue.enqueue(current);
-    }
 
-    public static void printTreasuresToBoard(enigma.console.Console cn,java.util.Random random , CircularQueue inputQueue) {
+        // Sadece ekranda o konumu yaz
+        cn.getTextWindow().setCursorPosition(x, y);
+        cn.getTextWindow().output(current);
 
-        Timer timer = new Timer();
-        while (!game_over){
-            TimerTask printTreasure = new TimerTask() {
-                @Override
-                public void run() {
-                    printTreasure(cn,inputQueue,random);
-                }
-            };
-            timer.scheduleAtFixedRate(printTreasure, 0, 2000);
-        }
-
-
+        inputQueue.enqueue(dequeued);
     }
 
 
+    public static void printTreasuresToBoard(enigma.console.Console cn,java.util.Random random , CircularQueue inputQueue) throws InterruptedException {
+
+        Thread.sleep(2000);
+        printTreasure(cn,inputQueue,random);
 
 
-    public static void main(String[] args) {
+    }
+
+
+
+
+    public static void main(String[] args) throws InterruptedException {
         Random random = new Random();
         enigma.console.Console cn = Enigma.getConsole("inputqueue");
         LinkedList<String> input = new LinkedList<>();
