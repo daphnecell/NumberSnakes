@@ -1,0 +1,59 @@
+import enigma.core.Enigma;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+public class Main {
+    public enigma.console.Console cn = Enigma.getConsole("Snake");
+    private KeyListener klis;
+
+    private boolean upPressed = false;
+    private boolean downPressed = false;
+    private boolean leftPressed = false;
+    private boolean rightPressed = false;
+
+    public Main() throws Exception {
+        Maze maze = new Maze("C:\\Users\\ARDA-PC\\IdeaProjects\\pbl2.2\\src\\maze.txt");
+
+            klis = new KeyListener() {
+
+                public void keyTyped(KeyEvent e) {
+                }
+
+
+                public void keyPressed(KeyEvent e) {
+                    int code = e.getKeyCode();
+                    if (code == KeyEvent.VK_W) upPressed = true;
+                    if (code == KeyEvent.VK_S) downPressed = true;
+                    if (code == KeyEvent.VK_A) leftPressed = true;
+                    if (code == KeyEvent.VK_D) rightPressed = true;
+                }
+
+
+                public void keyReleased(KeyEvent e) {
+                    int code = e.getKeyCode();
+                    if (code == KeyEvent.VK_W) upPressed = false;
+                    if (code == KeyEvent.VK_S) downPressed = false;
+                    if (code == KeyEvent.VK_A) leftPressed = false;
+                    if (code == KeyEvent.VK_D) rightPressed = false;
+                }
+            };
+            cn.getTextWindow().addKeyListener(klis);
+
+            maze.printMaze();
+
+            while (true) {
+                if (upPressed) maze.movePlayer('W');
+                if (downPressed) maze.movePlayer('S');
+                if (leftPressed) maze.movePlayer('A');
+                if (rightPressed) maze.movePlayer('D');
+
+                Thread.sleep(200);
+
+
+            }
+        }
+
+    public static void main(String[] args) throws Exception {
+        new Main();
+    }
+}
