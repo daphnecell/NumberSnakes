@@ -38,7 +38,7 @@ public class Main {
         };
         cn.getTextWindow().addKeyListener(klis);
 
-        Maze.printMaze();
+        Maze.printMaze(cn);
         Random random = new Random();
 
         //Here I've created Input Queue and printed it on the enigma console
@@ -49,21 +49,36 @@ public class Main {
 
 
 
-        Maze.printMaze();
+        Maze.printMaze(cn);
 
+        //some timing shit
         int tickCounter = 0;
+        long lastPlayerMove = System.currentTimeMillis();
+        long lastInputUpdate = System.currentTimeMillis();
+
+
         while (true) {
-            if (currentDircection != ' ') {
-                maze.movePlayer(currentDircection);
+            long now = System.currentTimeMillis();
+
+            // player moves (in every 200 ms)
+            if (now - lastPlayerMove >= 200) {
+                if (currentDircection != ' ') {
+                    maze.movePlayer(currentDircection);
+                }
+                lastPlayerMove = now;
             }
 
-            //Here I print treasure to the board in every 2 second, and update the current state of input queue on console.
-            tickCounter++;
-            if (tickCounter % 50 == 0) {
-                InputQueue.printTreasuresToBoard(cn, random, inputQueue);
-                InputQueue.printInputQueueToBoard(inputQueue, cn);
+            // Input queue and treasure operations (in every 20 ms)
+            if (now - lastInputUpdate >= 20) {
+                tickCounter++;
+                if (tickCounter % 50 == 0) {
+                    InputQueue.printTreasuresToBoard(cn, random, inputQueue);
+                    InputQueue.printInputQueueToBoard(inputQueue, cn);
+                }
+                lastInputUpdate = now;
             }
-            Thread.sleep(20);
+
+            Thread.sleep(5); // a little time to avoid fucking CPU
         }
 
 

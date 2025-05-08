@@ -32,18 +32,17 @@ public class Maze {
         }
     }
 
-    public static void printMaze() {
+    public static void printMaze(enigma.console.Console cn) {
         for (int i = 0; i < 23; i++) {
             for (int j = 0; j < 55; j++) {
+                cn.getTextWindow().setCursorPosition(j, i);
                 if (i == playerX && j == playerY) {
-                    System.out.print('@');
+                    cn.getTextWindow().output('@');
                 } else {
-                    System.out.print(maze[i][j]);
+                    cn.getTextWindow().output(maze[i][j]);
                 }
             }
-            System.out.println();
         }
-
     }
 
 
@@ -62,7 +61,7 @@ public class Maze {
         }
 
 
-        if (newX >= 0 && newX < 25 && newY >= 0 && newY < 57 && maze[newX][newY] != '#') {
+        if (newX >= 0 && newX < 23 && newY >= 0 && newY < 55 && maze[newX][newY] != '#') {
 
 
             cn.getTextWindow().output(playerY, playerX, ' ');

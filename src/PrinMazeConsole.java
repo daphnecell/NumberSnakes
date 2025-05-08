@@ -11,7 +11,7 @@ public class PrinMazeConsole {
         enigma.console.Console cn = Enigma.getConsole("maze");
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("src/maze.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("/Users/isikdefneerdemgil/IdeaProjects/NumberSnakes0/src/maze.txt"));
             String line;
 
             while ((line = reader.readLine()) != null) {
