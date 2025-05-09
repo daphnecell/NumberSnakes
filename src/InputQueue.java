@@ -120,6 +120,16 @@ public class InputQueue {
 
     }
 
+    public static void trapCase(){
+
+    }
+
+    public static void snakeCase(){
+
+    }
+
+
+
 
 
 
