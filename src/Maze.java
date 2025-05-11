@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import enigma.console.TextAttributes;
+import java.awt.Color;
 
 import enigma.core.Enigma;
 
@@ -72,6 +74,37 @@ public class Maze {
 
 
             cn.getTextWindow().output(playerY, playerX, '@');
+        }
+    }
+
+    public static boolean isValidPosition(int x, int y) {
+        return x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y] != '#';
+    }
+
+    public static void clearPosition(int x, int y, enigma.console.Console cn ) {
+        if (x >= 0 && x < maze.length && y >= 0 && y < maze[0].length) {
+            maze[x][y] = ' ';
+            cn.getTextWindow().output(y, x, ' ');
+        }
+    }
+
+    public static void placeElement(int x, int y, char element, enigma.console.Console cn) {
+        if (isValidPosition(x, y)) {
+            maze[x][y] = element;
+
+
+            TextAttributes attr = new TextAttributes(Color.WHITE);
+            switch (element) {
+                case 'P': attr = new TextAttributes(Color.GREEN); break;
+                case 'C': attr = new TextAttributes(Color.RED); break;
+                case 'S': attr = new TextAttributes(Color.MAGENTA); break;
+                case '1': case '2': case '3': attr = new TextAttributes(Color.YELLOW); break;
+                case '@': attr = new TextAttributes(Color.CYAN); break;
+                case '=': attr = new TextAttributes(Color.ORANGE); break;
+                case '.': attr = new TextAttributes(Color.LIGHT_GRAY); break;
+            }
+
+            cn.getTextWindow().output(y, x, element, attr);
         }
     }
 }

@@ -61,8 +61,6 @@ public class InputQueue {
         }
     }
 
-
-    //this method prints the input queue to the console
     public static void printInputQueueToBoard(CircularQueue inputQueue, enigma.console.Console cn) {
         int size = inputQueue.size();
         int count = 1;
@@ -111,7 +109,6 @@ public class InputQueue {
         inputQueue.enqueue(dequeued);
     }
 
-
     public static void printTreasuresToBoard(enigma.console.Console cn,java.util.Random random , CircularQueue inputQueue) throws InterruptedException {
 
         Thread.sleep(2000);
@@ -127,9 +124,6 @@ public class InputQueue {
     public static void snakeCase(){
 
     }
-
-
-
 
 
 

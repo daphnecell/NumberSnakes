@@ -15,7 +15,7 @@ public class Main {
     private char currentDircection = ' ';
 
     public Main() throws Exception {
-        Maze maze = new Maze("/Users/isikdefneerdemgil/IdeaProjects/NumberSnakes0/src/maze.txt");
+        Maze maze = new Maze("src\\maze.txt");
 
         klis = new KeyListener() {
 
@@ -25,10 +25,10 @@ public class Main {
 
             public void keyPressed(KeyEvent e) {
                 int code = e.getKeyCode();
-                if (code == KeyEvent.VK_W) upPressed = true;
-                if (code == KeyEvent.VK_S) downPressed = true;
-                if (code == KeyEvent.VK_A) leftPressed = true;
-                if (code == KeyEvent.VK_D) rightPressed = true;
+                if (code == KeyEvent.VK_W) currentDircection = 'W';
+                if (code == KeyEvent.VK_S) currentDircection = 'S';
+                if (code == KeyEvent.VK_A) currentDircection = 'A';
+                if (code == KeyEvent.VK_D) currentDircection = 'D';
             }
 
 
@@ -61,7 +61,7 @@ public class Main {
             long now = System.currentTimeMillis();
 
             // player moves (in every 200 ms)
-            if (now - lastPlayerMove >= 200) {
+            if (now - lastPlayerMove >= 120) {
                 if (currentDircection != ' ') {
                     maze.movePlayer(currentDircection);
                 }
@@ -78,7 +78,7 @@ public class Main {
                 lastInputUpdate = now;
             }
 
-            Thread.sleep(5); // a little time to avoid fucking CPU
+             // a little time to avoid fucking CPU
         }
 
 

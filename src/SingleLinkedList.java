@@ -2,73 +2,65 @@ public class SingleLinkedList {
     Node head;
 
     public void addNode(Object data) {
+        Node newNode = new Node(data);
         if (head == null) {
-            Node newNode = new Node(data);
             head = newNode;
-        }
-        else{
+        } else {
             Node temp = head;
-            while (temp.getLink()!=null){
+            while (temp.getLink() != null) {
                 temp = temp.getLink();
             }
-            Node newNode = new Node(data);
             temp.setLink(newNode);
         }
     }
 
-    public int size(){
-        if (head == null){
-            return 0;
+    public int size() {
+        int count = 0;
+        Node temp = head;
+        while (temp != null) {
+            count++;
+            temp = temp.getLink();
         }
-        else{
-            int count = 0;
-            Node temp = head;
-            while (temp!=null){
-                temp=temp.getLink();
-                count++;
-            }
-            return count;
-        }
+        return count;
     }
 
-    public void display(){
-        if (head == null){
+    public void display() {
+        if (head == null) {
             System.out.println("Linked list is empty");
-        }
-        else{
+        } else {
             Node temp = head;
-            while (temp.getLink()!=null){
+            while (temp != null) {
                 System.out.println(temp.getData() + " ");
-                temp=temp.getLink();
+                temp = temp.getLink();
             }
         }
     }
 
-    public int findVarience(){
+    public int findVariance() {
         int sum = 0;
         int count = 0;
-
         Node temp = head;
-        while (temp.getLink()!=null){
+        while (temp != null) {
             count++;
             sum += Integer.parseInt(temp.getData().toString());
-            temp=temp.getLink();
+            temp = temp.getLink();
         }
-        int average = sum/count;
-        temp=head;
-
-        int sum2 = 0;
-        while (temp.getLink()!=null){
-            count++;
-            sum2 += Math.pow(Integer.parseInt(temp.getData().toString()) - average,2);
-            temp=temp.getLink();
+        if (count == 0) return 0;
+        double average = (double) sum / count;
+        temp = head;
+        double sum2 = 0;
+        while (temp != null) {
+            sum2 += Math.pow(Integer.parseInt(temp.getData().toString()) - average, 2);
+            temp = temp.getLink();
         }
-        int variance = sum2/count;
-        return variance;
+        return (int) (sum2 / count);
     }
 
-    public void printAddress(){
+    public void printAddresses() {
         Node temp = head;
-        System.out.print(temp);
+        while (temp != null) {
+            System.out.println(temp);
+            temp = temp.getLink();
+        }
     }
 }
