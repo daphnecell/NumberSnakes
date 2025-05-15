@@ -1,23 +1,23 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import enigma.core.Enigma;
 import enigma.console.TextAttributes;
 import java.awt.Color;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Random;
+
+import enigma.core.Enigma;
 
 public class Maze {
     public static char[][] maze;
-    private static enigma.console.Console cn = Enigma.getConsole("Number Snakes");
-
+    private static int playerX;
+    private static int playerY;
+    private enigma.console.Console cn = Enigma.getConsole("Maze Game");
 
     public Maze(String path) {
         maze = new char[23][55];
+        playerX = 11;
+        playerY = 27;
         loadMaze(path);
     }
-
 
     private void loadMaze(String path) {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -30,59 +30,50 @@ public class Maze {
                 row++;
             }
         } catch (IOException e) {
-            System.out.println("Error reading maze file: " + e.getMessage());
+            System.out.println("Dosya okunurken hata oluştu: " + e.getMessage());
+        }
+    }
 
-            initializeDefaultMaze();
+    public static void printMaze(enigma.console.Console cn) {
+        for (int i = 0; i < 23; i++) {
+            for (int j = 0; j < 55; j++) {
+                cn.getTextWindow().setCursorPosition(j, i);
+                if (i == playerX && j == playerY) {
+                    cn.getTextWindow().output('@');
+                } else {
+                    cn.getTextWindow().output(maze[i][j]);
+                }
+            }
         }
     }
 
 
-    private void initializeDefaultMaze() {
+    public void movePlayer(char direction) {
+        int newX = playerX;
+        int newY = playerY;
 
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[0].length; j++) {
-                if (i == 0 || i == maze.length - 1 || j == 0 || j == maze[0].length - 1) {
-                    maze[i][j] = '#';
-                } else {
-                    maze[i][j] = ' ';
-                }
-            }
+        switch (direction) {
+            case 'W': newX--; break;
+            case 'S': newX++; break;
+            case 'A': newY--; break;
+            case 'D': newY++; break;
+            default:
+                System.out.println("Geçersiz tuş");
+                return;
         }
 
 
-        Random random = new Random();
-        for (int i = 0; i < 100; i++) {
-            int x = random.nextInt(maze.length - 2) + 1;
-            int y = random.nextInt(maze[0].length - 2) + 1;
-            maze[x][y] = '#';
-        }
-    }
+        if (newX >= 0 && newX < 23 && newY >= 0 && newY < 55 && maze[newX][newY] != '#') {
 
 
-    public static void printMaze() {
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[0].length; j++) {
-                char ch = maze[i][j];
+            cn.getTextWindow().output(playerY, playerX, ' ');
 
 
-                if (ch == 'P') {
-                    cn.getTextWindow().output(j, i, ch, new TextAttributes(Color.GREEN));
-                } else if (ch == 'C') {
-                    cn.getTextWindow().output(j, i, ch, new TextAttributes(Color.RED));
-                } else if (ch == 'S') {
-                    cn.getTextWindow().output(j, i, ch, new TextAttributes(Color.MAGENTA));
-                } else if (ch == '1' || ch == '2' || ch == '3') {
-                    cn.getTextWindow().output(j, i, ch, new TextAttributes(Color.YELLOW));
-                } else if (ch == '@') {
-                    cn.getTextWindow().output(j, i, ch, new TextAttributes(Color.CYAN));
-                } else if (ch == '=') {
-                    cn.getTextWindow().output(j, i, ch, new TextAttributes(Color.ORANGE));
-                } else if (ch == '.') {
-                    cn.getTextWindow().output(j, i, ch, new TextAttributes(Color.LIGHT_GRAY));
-                } else {
-                    cn.getTextWindow().output(j, i, ch);
-                }
-            }
+            playerX = newX;
+            playerY = newY;
+
+
+            cn.getTextWindow().output(playerY, playerX, '@');
         }
     }
 
@@ -90,48 +81,14 @@ public class Maze {
         return x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y] != '#';
     }
 
-
-    public static boolean isTreasure(int x, int y) {
-        char item = maze[x][y];
-        return item == '1' || item == '2' || item == '3' || item == '@';
-    }
-
-
-    public static int[] findRandomEmptyPosition() {
-        Random random = new Random();
-        int x, y;
-
-        do {
-            x = random.nextInt(maze.length);
-            y = random.nextInt(maze[0].length);
-        } while (maze[x][y] != ' ');
-
-        return new int[]{x, y};
-    }
-
-
-    public static List<int[]> findAllTreasures() {
-        List<int[]> treasures = new LinkedList<>();
-
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[0].length; j++) {
-                char cell = maze[i][j];
-                if (cell == '1' || cell == '2' || cell == '3') {
-                    treasures.add(new int[]{i, j});
-                }
-            }
+    public static void clearPosition(int x, int y, enigma.console.Console cn ) {
+        if (x >= 0 && x < maze.length && y >= 0 && y < maze[0].length) {
+            maze[x][y] = ' ';
+            cn.getTextWindow().output(y, x, ' ');
         }
-
-        return treasures;
     }
 
-
-    public static boolean isTrap(int x, int y) {
-        return maze[x][y] == '=';
-    }
-
-
-    public static void placeElement(int x, int y, char element) {
+    public static void placeElement(int x, int y, char element, enigma.console.Console cn) {
         if (isValidPosition(x, y)) {
             maze[x][y] = element;
 
@@ -148,175 +105,6 @@ public class Maze {
             }
 
             cn.getTextWindow().output(y, x, element, attr);
-        }
-    }
-
-
-    public static void clearPosition(int x, int y) {
-        if (x >= 0 && x < maze.length && y >= 0 && y < maze[0].length) {
-            maze[x][y] = ' ';
-            cn.getTextWindow().output(y, x, ' ');
-        }
-    }
-
-
-    public static Stack findPath(int startX, int startY, int targetX, int targetY) {
-
-        Stack pathStack = new Stack(maze.length * maze[0].length);
-
-
-        if (startX == targetX && startY == targetY) {
-            return pathStack;
-        }
-
-
-        boolean[][] visited = new boolean[maze.length][maze[0].length];
-        int[][][] parent = new int[maze.length][maze[0].length][2];
-        PriorityQueue<PathNode> openList = new PriorityQueue<>();
-
-
-        openList.add(new PathNode(startX, startY, 0, calculateHeuristic(startX, startY, targetX, targetY)));
-
-
-        int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-
-
-        while (!openList.isEmpty()) {
-
-            PathNode current = openList.poll();
-            int cx = current.getX();
-            int cy = current.getY();
-
-
-            if (visited[cx][cy]) {
-                continue;
-            }
-
-            visited[cx][cy] = true;
-
-
-            if (cx == targetX && cy == targetY) {
-
-                reconstructPath(parent, cx, cy, startX, startY, pathStack);
-                return pathStack;
-            }
-
-
-            for (int[] dir : directions) {
-                int nx = cx + dir[0];
-                int ny = cy + dir[1];
-
-
-                if (isValidPosition(nx, ny) && !visited[nx][ny]) {
-
-                    int newG = current.getG() + 1;
-                    int newH = calculateHeuristic(nx, ny, targetX, targetY);
-
-
-                    openList.add(new PathNode(nx, ny, newG, newH));
-
-
-                    parent[nx][ny][0] = cx;
-                    parent[nx][ny][1] = cy;
-                }
-            }
-        }
-
-
-        return pathStack;
-    }
-
-
-    private static int calculateHeuristic(int x, int y, int targetX, int targetY) {
-        return Math.abs(x - targetX) + Math.abs(y - targetY);
-    }
-
-
-    private static void reconstructPath(int[][][] parent, int x, int y, int startX, int startY, Stack pathStack) {
-
-        Stack tempStack = new Stack(maze.length * maze[0].length);
-
-
-        int currentX = x;
-        int currentY = y;
-
-        while (!(currentX == startX && currentY == startY)) {
-
-            tempStack.push(new int[]{currentX, currentY});
-
-
-            int tempX = parent[currentX][currentY][0];
-            int tempY = parent[currentX][currentY][1];
-            currentX = tempX;
-            currentY = tempY;
-        }
-
-
-        while (!tempStack.isEmpty()) {
-            pathStack.push(tempStack.pop());
-        }
-    }
-
-
-    private static class PriorityQueue<T extends Comparable<T>> {
-        private LinkedList<T> list = new LinkedList<>();
-
-        public void add(T item) {
-
-            int i = 0;
-            while (i < list.size() && item.compareTo(list.get(i)) > 0) {
-                i++;
-            }
-            list.add(i, item);
-        }
-
-        public T poll() {
-            if (isEmpty()) return null;
-            return list.removeFirst();
-        }
-
-        public boolean isEmpty() {
-            return list.isEmpty();
-        }
-    }
-
-
-    public static class PathNode implements Comparable<PathNode> {
-        private int x;
-        private int y;
-        private int g;
-        private int h;
-
-        public PathNode(int x, int y, int g, int h) {
-            this.x = x;
-            this.y = y;
-            this.g = g;
-            this.h = h;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
-
-        public int getG() {
-            return g;
-        }
-
-        public int getH() {
-            return h;
-        }
-
-        public int getF() {
-            return g + h;
-        }
-
-        @Override
-        public int compareTo(PathNode other) {
-            return Integer.compare(this.getF(), other.getF());
         }
     }
 }

@@ -1,13 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.Random;
 import enigma.core.Enigma;
 
 public class PrinMazeConsole {
 
     public static void main(String[] args) {
-        LinkedList<String> lines = new LinkedList<>();
+        SingleLinkedList lines = new SingleLinkedList();
         enigma.console.Console cn = Enigma.getConsole("maze");
 
         try {
@@ -15,7 +15,7 @@ public class PrinMazeConsole {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                lines.add(line);
+                lines.addNode(line);
             }
 
             reader.close();
@@ -23,8 +23,11 @@ public class PrinMazeConsole {
             System.out.println("Dosya okunamadı: " + e.getMessage());
         }
 
-        for (String satir : lines) {
-            System.out.println(satir);
+
+        Node current = lines.head;
+        while (current != null) {
+            System.out.println(current.getData());
+            current = current.getLink();
         }
     }
 }

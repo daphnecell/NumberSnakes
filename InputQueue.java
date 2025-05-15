@@ -1,10 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import enigma.core.Enigma;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Random;
 
 public class InputQueue {
@@ -33,36 +27,59 @@ public class InputQueue {
     int AIscore_3 = 250;
     int AIscore_AD = 500;
 
-    List<String> input = new ArrayList<>();
+    SingleLinkedList input = new SingleLinkedList();
     CircularQueue inputQueue = new CircularQueue(100);
 
-    static void createInputQueue(int per_treasure1,int per_treasure2,int per_treasure3,int per_treasureAD,int per_treasureS, LinkedList<String> input, CircularQueue inputQueue) {
+    static void createInputQueue(int per_treasure1, int per_treasure2, int per_treasure3, int per_treasureAD, int per_treasureS, SingleLinkedList input, CircularQueue inputQueue) {
+
+        String[] elements = new String[per_treasure1 + per_treasure2 + per_treasure3 + per_treasureAD + per_treasureS];
+        int index = 0;
+
+
         for (int i = 0; i < per_treasure1; i++) {
-            input.add("1");
+            elements[index++] = "1";
         }
         for (int i = 0; i < per_treasure2; i++) {
-            input.add("2");
+            elements[index++] = "2";
         }
         for (int i = 0; i < per_treasure3; i++) {
-            input.add("3");
+            elements[index++] = "3";
         }
         for (int i = 0; i < per_treasureAD; i++) {
-            input.add("@");
+            elements[index++] = "@";
         }
         for (int i = 0; i < per_treasureS; i++) {
-            input.add("S");
+            elements[index++] = "S";
         }
 
-        Collections.shuffle(input);
 
-        int size = input.size();
-        while (!input.isEmpty()){
-            inputQueue.enqueue(input.remove());
+        shuffle(elements);
+
+
+        for (String element : elements) {
+            input.addNode(element);
+        }
+
+
+        Node current = input.head;
+        while (current != null) {
+            inputQueue.enqueue(current.getData());
+            current = current.getLink();
         }
     }
 
 
-    //this method prints the input queue to the console
+    private static void shuffle(String[] array) {
+        Random random = new Random();
+        for (int i = array.length - 1; i > 0; i--) {
+            int index = random.nextInt(i + 1);
+
+            String temp = array[index];
+            array[index] = array[i];
+            array[i] = temp;
+        }
+    }
+
     public static void printInputQueueToBoard(CircularQueue inputQueue, enigma.console.Console cn) {
         int size = inputQueue.size();
         int count = 1;
@@ -72,7 +89,7 @@ public class InputQueue {
         cn.getTextWindow().setCursorPosition(57, 3);
         cn.getTextWindow().output("<<<<<<<<<<<<<<<");
         for (int i = 0; i < size; i++) {
-            if (count <= 15) { //only the first 15 elements on queue will show up on console
+            if (count <= 15) {
                 String current = (String) inputQueue.dequeue();
                 cn.getTextWindow().setCursorPosition(57 + index, 4);
                 cn.getTextWindow().output(current);
@@ -80,7 +97,7 @@ public class InputQueue {
                 count++;
                 index++;
             }
-            else { // to not break the order of input queue.
+            else {
                 inputQueue.enqueue(inputQueue.dequeue());
             }
         }
@@ -101,37 +118,36 @@ public class InputQueue {
         }
         String dequeued = (String) inputQueue.dequeue();
         char current = dequeued.charAt(0);
-        // Maze içeriğini güncelle
+
         Maze.maze[y][x] = current;
 
-        // Sadece ekranda o konumu yaz
+
         cn.getTextWindow().setCursorPosition(x, y);
         cn.getTextWindow().output(current);
 
         inputQueue.enqueue(dequeued);
     }
 
-
-    public static void printTreasuresToBoard(enigma.console.Console cn,java.util.Random random , CircularQueue inputQueue) throws InterruptedException {
-
+    public static void printTreasuresToBoard(enigma.console.Console cn, java.util.Random random, CircularQueue inputQueue) throws InterruptedException {
         Thread.sleep(2000);
-        printTreasure(cn,inputQueue,random);
+        printTreasure(cn, inputQueue, random);
+    }
 
+    public static void trapCase() {
 
     }
 
+    public static void snakeCase() {
 
-
+    }
 
     public static void main(String[] args) throws InterruptedException {
         Random random = new Random();
         enigma.console.Console cn = Enigma.getConsole("inputqueue");
-        LinkedList<String> input = new LinkedList<>();
+        SingleLinkedList input = new SingleLinkedList();
         CircularQueue inputQueue = new CircularQueue(100);
-        createInputQueue(per_treasure1,per_treasure2,per_treasure3, per_treasureAD, per_treasureS, input, inputQueue);
+        createInputQueue(per_treasure1, per_treasure2, per_treasure3, per_treasureAD, per_treasureS, input, inputQueue);
         printInputQueueToBoard(inputQueue, cn);
-        printTreasuresToBoard(cn,random,inputQueue);
-
+        printTreasuresToBoard(cn, random, inputQueue);
     }
-
 }
