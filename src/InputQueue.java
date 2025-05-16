@@ -36,7 +36,7 @@ public class InputQueue {
     int AIscore_3 = 250;
     int AIscore_AD = 500;
 
-    List<String> input = new ArrayList<>();
+    List<String> input = new LinkedList<>();
     CircularQueue inputQueue = new CircularQueue(100);
 
     static void createInputQueue(int per_treasure1,int per_treasure2,int per_treasure3,int per_treasureAD,int per_treasureS, LinkedList<String> input, CircularQueue inputQueue) {
