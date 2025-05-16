@@ -15,11 +15,11 @@ public class InputQueue {
 
     Random random = new Random();
 
-    public static int per_treasure1 = 40;
+    public static int per_treasure1 = 50;
     static int per_treasure2 = 25;
     static int per_treasure3 = 13;
     static int per_treasureAD = 9;
-    static int per_treasureS = 13;
+    static int per_treasureS = 3;
 
     int playerscore_1 = 1;
     int playerscore_2 = 4;
@@ -114,10 +114,9 @@ public class InputQueue {
         }
         String dequeued = (String) inputQueue.dequeue();
         current = dequeued.charAt(0);
-        // Maze içeriğini güncelle
+
         Maze.maze[y][x] = current;
 
-        // Sadece ekranda o konumu yaz
         cn.getTextWindow().setCursorPosition(x, y);
         cn.getTextWindow().output(current);
         inputQueue.enqueue(dequeued);

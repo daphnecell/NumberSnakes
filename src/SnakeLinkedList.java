@@ -225,6 +225,7 @@ public class SnakeLinkedList {
     public int random_column;
     public int random_row;
 
+
     public char selectRandomWaffle() {
         boolean found = false;
         char treasure = ' ';
@@ -279,7 +280,7 @@ public class SnakeLinkedList {
 
         String[] motions = {"left", "right", "up", "down"};
 
-        while (count != 25) {
+        while (count < 25) {
             //in every move there isa %20 possibility to change direction
             int n = random.nextInt(5);
             if (n == 0) {
@@ -546,6 +547,10 @@ public class SnakeLinkedList {
             Thread.sleep(400); //the period of snake:))
         }
     }
+
+
+
+
 
 
     public static void main(String[] args) throws InterruptedException {

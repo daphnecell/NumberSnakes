@@ -11,6 +11,8 @@ public class Main {
     public enigma.console.Console cn = Enigma.getConsole("Number Snakes");
     private KeyListener klis;
 
+    private final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3, NONE = -1;
+    private int currentDirection = NONE;
 
     private boolean gameRunning = true;
     public static int playerScore = 0;
@@ -89,7 +91,7 @@ public class Main {
 
 
 
-
+            processPlayerInput();
             tickCounter++;
 
 
@@ -131,21 +133,14 @@ public class Main {
 
             public void keyPressed(KeyEvent e) {
                 int code = e.getKeyCode();
-                if (code == KeyEvent.VK_UP) upPressed = true;
-                if (code == KeyEvent.VK_DOWN) downPressed = true;
-                if (code == KeyEvent.VK_LEFT) leftPressed = true;
-                if (code == KeyEvent.VK_RIGHT) rightPressed = true;
+                if (code == KeyEvent.VK_UP) currentDirection = UP;
+                if (code == KeyEvent.VK_DOWN) currentDirection = DOWN;
+                if (code == KeyEvent.VK_LEFT) currentDirection = LEFT;
+                if (code == KeyEvent.VK_RIGHT) currentDirection = RIGHT;
                 if (code == KeyEvent.VK_SPACE) spacePressed = true;
             }
 
-            public void keyReleased(KeyEvent e) {
-                int code = e.getKeyCode();
-                if (code == KeyEvent.VK_UP) upPressed = false;
-                if (code == KeyEvent.VK_DOWN) downPressed = false;
-                if (code == KeyEvent.VK_LEFT) leftPressed = false;
-                if (code == KeyEvent.VK_RIGHT) rightPressed = false;
-                if (code == KeyEvent.VK_SPACE) spacePressed = false;
-            }
+            public void keyReleased(KeyEvent e) {}
         };
         cn.getTextWindow().addKeyListener(klis);
     }
@@ -183,43 +178,30 @@ public class Main {
 
 
     private void processPlayerInput() {
-
         int moveInterval = (quickMovement && playerEnergy > 0) ? 1 : 2;
-
 
         if (tickCounter % moveInterval == 0) {
             int newX = player.getX();
             int newY = player.getY();
 
+            if (currentDirection == UP) newX--;
+            else if (currentDirection == DOWN) newX++;
+            else if (currentDirection == LEFT) newY--;
+            else if (currentDirection == RIGHT) newY++;
 
-            if (upPressed) newX--;
-            if (downPressed) newX++;
-            if (leftPressed) newY--;
-            if (rightPressed) newY++;
-
-
-            if (Maze.isValidPosition(newX, newY) && Maze.maze[newX][newY] != '#' &&
-                    Maze.maze[newX][newY] != 'C' && Maze.maze[newX][newY] != 'S') {
-
+            if (Maze.isValidPosition(newX, newY) &&
+                    Maze.maze[newX][newY] != '#' &&
+                    Maze.maze[newX][newY] != 'C' &&
+                    Maze.maze[newX][newY] != 'S') {
 
                 Maze.clearPosition(player.getX(), player.getY());
-
-
                 collectItem(newX, newY);
-
-
                 player.setX(newX);
                 player.setY(newY);
-
-
                 Maze.placeElement(newX, newY, 'P');
 
-
-                if (quickMovement && playerEnergy > 0) {
-                    playerEnergy--;
-                }
+                if (quickMovement && playerEnergy > 0) playerEnergy--;
             }
-
 
             if (spacePressed && playerTraps > 0) {
                 placeTrap();
@@ -227,7 +209,6 @@ public class Main {
             }
         }
     }
-
 
     private void collectItem(int x, int y) {
         char item = Maze.maze[x][y];
@@ -256,23 +237,16 @@ public class Main {
         int trapX = player.getX();
         int trapY = player.getY();
 
-
-        if (upPressed) trapX--;
-        else if (downPressed) trapX++;
-        else if (leftPressed) trapY--;
-        else if (rightPressed) trapY++;
+        if (currentDirection == UP) trapX--;
+        else if (currentDirection == DOWN) trapX++;
+        else if (currentDirection == LEFT) trapY--;
+        else if (currentDirection == RIGHT) trapY++;
         else return;
 
-
         if (Maze.isValidPosition(trapX, trapY) && Maze.maze[trapX][trapY] == ' ') {
-
             Maze.placeElement(trapX, trapY, '=');
-
-
             activeTrapLocations.add(new int[]{trapX, trapY});
             trapTimers.add(trapDuration);
-
-
             playerTraps--;
         }
     }
