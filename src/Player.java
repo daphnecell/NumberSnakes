@@ -15,20 +15,27 @@ public class Player {
         return y;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public void moveUp() {
-        x--;  // Yukarı hareket
+        x--;
     }
 
     public void moveDown() {
-        x++;  // Aşağı hareket
+        x++;
     }
 
     public void moveLeft() {
-        y--;  // Sol hareket
+        y--;
     }
 
     public void moveRight() {
-        y++;  // Sağ hareket
+        y++;
     }
-
 }

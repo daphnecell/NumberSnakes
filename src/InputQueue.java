@@ -1,7 +1,10 @@
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import enigma.console.TextAttributes;
 import enigma.core.Enigma;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,11 +15,11 @@ public class InputQueue {
 
     Random random = new Random();
 
-    public static int per_treasure1 = 50;
+    public static int per_treasure1 = 40;
     static int per_treasure2 = 25;
     static int per_treasure3 = 13;
     static int per_treasureAD = 9;
-    static int per_treasureS = 3;
+    static int per_treasureS = 13;
 
     int playerscore_1 = 1;
     int playerscore_2 = 4;
@@ -68,12 +71,21 @@ public class InputQueue {
         cn.getTextWindow().setCursorPosition(57, 2);
         cn.getTextWindow().output("Input: ");
         cn.getTextWindow().setCursorPosition(57, 3);
-        cn.getTextWindow().output("<<<<<<<<<<<<<<<");
+        cn.getTextWindow().output("<<<<<<<<<<<<<<<", new TextAttributes(Color.WHITE));
         for (int i = 0; i < size; i++) {
             if (count <= 15) { //only the first 15 elements on queue will show up on console
+
                 String current = (String) inputQueue.dequeue();
                 cn.getTextWindow().setCursorPosition(57 + index, 4);
-                cn.getTextWindow().output(current);
+                TextAttributes attr = new TextAttributes(Color.WHITE);
+                if (current.equals("1") || current.equals("2") || current.equals("3")) {
+                    attr = new TextAttributes(Color.YELLOW);
+                } else if (current.equals("@")) {
+                    attr = new TextAttributes(Color.CYAN);
+                } else if (current.equals("S")) {
+                    attr = new TextAttributes(Color.MAGENTA);
+                }
+                cn.getTextWindow().output(current, attr);
                 inputQueue.enqueue(current);
                 count++;
                 index++;
@@ -83,10 +95,13 @@ public class InputQueue {
             }
         }
         cn.getTextWindow().setCursorPosition(57, 5);
-        cn.getTextWindow().output("<<<<<<<<<<<<<<<");
+        cn.getTextWindow().output("<<<<<<<<<<<<<<<", new TextAttributes(Color.WHITE));
     }
 
-    private static void printTreasure(enigma.console.Console cn, CircularQueue inputQueue, java.util.Random random) {
+    public static int initial_snake_x = 0;
+    public static int initial_snake_y = 0;
+    enigma.console.Console cn;
+    private static boolean printTreasure(enigma.console.Console cn, CircularQueue inputQueue, java.util.Random random, char current, boolean snake_case) {
         int x = 2;
         int y = 2;
         boolean coordination_is_empty = false;
@@ -98,23 +113,31 @@ public class InputQueue {
             }
         }
         String dequeued = (String) inputQueue.dequeue();
-        char current = dequeued.charAt(0);
+        current = dequeued.charAt(0);
         // Maze içeriğini güncelle
         Maze.maze[y][x] = current;
 
         // Sadece ekranda o konumu yaz
         cn.getTextWindow().setCursorPosition(x, y);
         cn.getTextWindow().output(current);
-
         inputQueue.enqueue(dequeued);
+
+        //SNAKE CASE
+        if (current == 'S') {
+            Maze.maze[y][x] = ' ';
+            snake_case = true;
+            initial_snake_x = x;
+            initial_snake_y = y;
+
+        }
+        return snake_case;
     }
 
-    public static void printTreasuresToBoard(enigma.console.Console cn,java.util.Random random , CircularQueue inputQueue) throws InterruptedException {
-
+    public static boolean printTreasuresToBoard(enigma.console.Console cn,java.util.Random random , CircularQueue inputQueue, boolean snake_case) throws InterruptedException {
+        char current = ' ';
         Thread.sleep(2000);
-        printTreasure(cn,inputQueue,random);
-
-
+        printTreasure(cn,inputQueue,random, current, snake_case);
+        return snake_case;
     }
 
     public static void trapCase(){
@@ -134,7 +157,7 @@ public class InputQueue {
         CircularQueue inputQueue = new CircularQueue(100);
         createInputQueue(per_treasure1,per_treasure2,per_treasure3, per_treasureAD, per_treasureS, input, inputQueue);
         printInputQueueToBoard(inputQueue, cn);
-        printTreasuresToBoard(cn,random,inputQueue);
+        printTreasuresToBoard(cn,random,inputQueue,true);
 
     }
 
