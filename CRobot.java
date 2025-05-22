@@ -1,8 +1,6 @@
 import enigma.core.Enigma;
 import enigma.console.TextAttributes;
 import java.awt.Color;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Random;
 
 public class CRobot {
@@ -14,10 +12,10 @@ public class CRobot {
     private Random random;
     private enigma.console.Console cn;
 
-
-    private List<int[]> pathPositions;
+    private int[][] pathPositions;
+    private int pathSize;
     private int currentPathIndex;
-
+    private final int MAX_PATH_SIZE = 1000;
 
     public CRobot(int startX, int startY, enigma.console.Console console) {
         this.x = startX;
@@ -25,13 +23,12 @@ public class CRobot {
         this.cn = console;
         this.random = new Random();
         this.hasTarget = false;
-        this.pathPositions = new LinkedList<>();
+        this.pathPositions = new int[MAX_PATH_SIZE][2];
+        this.pathSize = 0;
         this.currentPathIndex = 0;
-
 
         Maze.placeElement(x, y, 'C');
     }
-
 
     public int getX() {
         return x;
@@ -45,96 +42,75 @@ public class CRobot {
         return hasTarget;
     }
 
-
     public void findRandomTarget() {
-
         if (hasTarget) {
             return;
         }
 
-
         clearPathMarkers();
 
-
-        this.pathPositions = new LinkedList<>();
+        this.pathSize = 0;
         this.currentPathIndex = 0;
 
+        SingleLinkedList treasures = Maze.findAllTreasures();
 
-        List<int[]> treasures = Maze.findAllTreasures();
-
-
-        if (treasures.isEmpty()) {
+        if (treasures.size() == 0) {
             hasTarget = false;
             return;
         }
 
-
         int randomIndex = random.nextInt(treasures.size());
-        int[] target = treasures.get(randomIndex);
+        int[] target = getTreasureAtIndex(treasures, randomIndex);
         targetX = target[0];
         targetY = target[1];
         hasTarget = true;
 
-
         findPathToTarget();
-
-
         markPathOnMaze();
     }
 
+    private int[] getTreasureAtIndex(SingleLinkedList treasures, int index) {
+        Node current = treasures.head;
+        for (int i = 0; i < index && current != null; i++) {
+            current = current.getLink();
+        }
+        return (int[]) current.getData();
+    }
 
     private void findPathToTarget() {
-
         boolean[][] visited = new boolean[Maze.maze.length][Maze.maze[0].length];
-
-
         int[][][] parent = new int[Maze.maze.length][Maze.maze[0].length][2];
-
-
         PriorityQueue<PathNode> openList = new PriorityQueue<>();
-
 
         openList.add(new PathNode(x, y, 0, calculateHeuristic(x, y)));
 
-
         int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
-
         while (!openList.isEmpty()) {
-
             PathNode current = openList.poll();
             int cx = current.getX();
             int cy = current.getY();
-
 
             if (visited[cx][cy]) {
                 continue;
             }
 
-
             visited[cx][cy] = true;
 
-
             if (cx == targetX && cy == targetY) {
-
                 reconstructPath(parent, cx, cy);
                 return;
             }
-
 
             for (int[] dir : directions) {
                 int nx = cx + dir[0];
                 int ny = cy + dir[1];
 
-
                 if (isValidPosition(nx, ny) && !visited[nx][ny]) {
-
                     int newG = current.getG() + 1;
                     int newH = calculateHeuristic(nx, ny);
 
-
                     openList.add(new PathNode(nx, ny, newG, newH));
-
 
                     parent[nx][ny][0] = cx;
                     parent[nx][ny][1] = cy;
@@ -142,35 +118,30 @@ public class CRobot {
             }
         }
 
-
         hasTarget = false;
     }
-
 
     private boolean isValidPosition(int x, int y) {
         return x >= 0 && x < Maze.maze.length && y >= 0 && y < Maze.maze[0].length
                 && Maze.maze[x][y] != '#';
     }
 
-
     private int calculateHeuristic(int x, int y) {
         return Math.abs(x - targetX) + Math.abs(y - targetY);
     }
 
-
     private void reconstructPath(int[][][] parent, int x, int y) {
 
-        List<int[]> path = new LinkedList<>();
-
+        int[][] tempPath = new int[MAX_PATH_SIZE][2];
+        int tempSize = 0;
 
         int currentX = x;
         int currentY = y;
 
-
         while (!(currentX == this.x && currentY == this.y)) {
-
-            path.add(0, new int[]{currentX, currentY});
-
+            tempPath[tempSize][0] = currentX;
+            tempPath[tempSize][1] = currentY;
+            tempSize++;
 
             int tempX = parent[currentX][currentY][0];
             int tempY = parent[currentX][currentY][1];
@@ -179,48 +150,42 @@ public class CRobot {
         }
 
 
-        this.pathPositions = path;
+        pathSize = tempSize;
+        for (int i = 0; i < pathSize; i++) {
+            pathPositions[i][0] = tempPath[tempSize - 1 - i][0];
+            pathPositions[i][1] = tempPath[tempSize - 1 - i][1];
+        }
     }
 
-
     private void markPathOnMaze() {
-        for (int[] pos : pathPositions) {
-
+        for (int i = 0; i < pathSize; i++) {
+            int[] pos = pathPositions[i];
             if (Maze.maze[pos[0]][pos[1]] == ' ') {
                 Maze.placeElement(pos[0], pos[1], '.');
             }
         }
     }
 
-
     public void move() {
-
         if (!hasTarget) {
             findRandomTarget();
             return;
         }
 
-
-        if (currentPathIndex >= pathPositions.size()) {
-
+        if (currentPathIndex >= pathSize) {
             if (x == targetX && y == targetY) {
-
                 clearPathMarkers();
                 hasTarget = false;
-
                 findRandomTarget();
             } else {
-
                 findRandomTarget();
             }
             return;
         }
 
-
-        int[] nextPos = pathPositions.get(currentPathIndex);
+        int[] nextPos = pathPositions[currentPathIndex];
         int nextX = nextPos[0];
         int nextY = nextPos[1];
-
 
         boolean hasTreasure = isTreasureAtPosition(nextX, nextY);
         char treasureType = ' ';
@@ -228,39 +193,29 @@ public class CRobot {
             treasureType = Maze.maze[nextX][nextY];
         }
 
-
         Maze.clearPosition(x, y);
-
 
         x = nextX;
         y = nextY;
-
 
         if (hasTreasure) {
             collectTreasureByType(treasureType);
         }
 
-
         if (x == targetX && y == targetY) {
-
             clearPathMarkers();
-
             hasTarget = false;
         } else {
-
             currentPathIndex++;
         }
 
-
         Maze.placeElement(x, y, 'C');
     }
-
 
     private boolean isTreasureAtPosition(int x, int y) {
         char cell = Maze.maze[x][y];
         return cell == '1' || cell == '2' || cell == '3' || cell == '@';
     }
-
 
     private void collectTreasureByType(char treasureType) {
         switch (treasureType) {
@@ -279,14 +234,12 @@ public class CRobot {
         }
     }
 
-
     private void collectTreasure() {
         if (isTreasureAtPosition(x, y)) {
             char treasureType = Maze.maze[x][y];
             collectTreasureByType(treasureType);
         }
     }
-
 
     private void clearPathMarkers() {
         for (int i = 0; i < Maze.maze.length; i++) {
@@ -298,11 +251,9 @@ public class CRobot {
         }
     }
 
-
     public boolean isAdjacentToPlayer(int playerX, int playerY) {
         return (Math.abs(x - playerX) + Math.abs(y - playerY)) == 1;
     }
-
 
     private class PathNode implements Comparable<PathNode> {
         private int x;

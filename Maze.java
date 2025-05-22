@@ -4,20 +4,16 @@ import java.io.IOException;
 import enigma.core.Enigma;
 import enigma.console.TextAttributes;
 import java.awt.Color;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Random;
 
 public class Maze {
     public static char[][] maze;
     private static enigma.console.Console cn = Enigma.getConsole("Number Snakes");
 
-
     public Maze(String path) {
         maze = new char[23][55];
         loadMaze(path);
     }
-
 
     private void loadMaze(String path) {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -31,14 +27,11 @@ public class Maze {
             }
         } catch (IOException e) {
             System.out.println("Error reading maze file: " + e.getMessage());
-
             initializeDefaultMaze();
         }
     }
 
-
     private void initializeDefaultMaze() {
-
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze[0].length; j++) {
                 if (i == 0 || i == maze.length - 1 || j == 0 || j == maze[0].length - 1) {
@@ -49,7 +42,6 @@ public class Maze {
             }
         }
 
-
         Random random = new Random();
         for (int i = 0; i < 100; i++) {
             int x = random.nextInt(maze.length - 2) + 1;
@@ -58,12 +50,10 @@ public class Maze {
         }
     }
 
-
     public static void printMaze() {
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze[0].length; j++) {
                 char ch = maze[i][j];
-
 
                 if (ch == 'P') {
                     cn.getTextWindow().output(j, i, ch, new TextAttributes(Color.GREEN));
@@ -90,12 +80,10 @@ public class Maze {
         return x >= 0 && x < maze.length && y >= 0 && y < maze[0].length && maze[x][y] != '#';
     }
 
-
     public static boolean isTreasure(int x, int y) {
         char item = maze[x][y];
         return item == '1' || item == '2' || item == '3' || item == '@';
     }
-
 
     public static int[] findRandomEmptyPosition() {
         Random random = new Random();
@@ -109,15 +97,14 @@ public class Maze {
         return new int[]{x, y};
     }
 
-
-    public static List<int[]> findAllTreasures() {
-        List<int[]> treasures = new LinkedList<>();
+    public static SingleLinkedList findAllTreasures() {
+        SingleLinkedList treasures = new SingleLinkedList();
 
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze[0].length; j++) {
                 char cell = maze[i][j];
                 if (cell == '1' || cell == '2' || cell == '3') {
-                    treasures.add(new int[]{i, j});
+                    treasures.addNode(new int[]{i, j});
                 }
             }
         }
@@ -125,16 +112,13 @@ public class Maze {
         return treasures;
     }
 
-
     public static boolean isTrap(int x, int y) {
         return maze[x][y] == '=';
     }
 
-
     public static void placeElement(int x, int y, char element) {
         if (isValidPosition(x, y)) {
             maze[x][y] = element;
-
 
             TextAttributes attr = new TextAttributes(Color.WHITE);
             switch (element) {
@@ -151,7 +135,6 @@ public class Maze {
         }
     }
 
-
     public static void clearPosition(int x, int y) {
         if (x >= 0 && x < maze.length && y >= 0 && y < maze[0].length) {
             maze[x][y] = ' ';
@@ -159,34 +142,27 @@ public class Maze {
         }
     }
 
-
     public static Stack findPath(int startX, int startY, int targetX, int targetY) {
-
         Stack pathStack = new Stack(maze.length * maze[0].length);
-
 
         if (startX == targetX && startY == targetY) {
             return pathStack;
         }
 
-
         boolean[][] visited = new boolean[maze.length][maze[0].length];
         int[][][] parent = new int[maze.length][maze[0].length][2];
-        PriorityQueue<PathNode> openList = new PriorityQueue<>();
 
+
+        SimplePriorityQueue openList = new SimplePriorityQueue();
 
         openList.add(new PathNode(startX, startY, 0, calculateHeuristic(startX, startY, targetX, targetY)));
 
-
         int[][] directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
-
         while (!openList.isEmpty()) {
-
             PathNode current = openList.poll();
             int cx = current.getX();
             int cy = current.getY();
-
 
             if (visited[cx][cy]) {
                 continue;
@@ -194,27 +170,20 @@ public class Maze {
 
             visited[cx][cy] = true;
 
-
             if (cx == targetX && cy == targetY) {
-
                 reconstructPath(parent, cx, cy, startX, startY, pathStack);
                 return pathStack;
             }
-
 
             for (int[] dir : directions) {
                 int nx = cx + dir[0];
                 int ny = cy + dir[1];
 
-
                 if (isValidPosition(nx, ny) && !visited[nx][ny]) {
-
                     int newG = current.getG() + 1;
                     int newH = calculateHeuristic(nx, ny, targetX, targetY);
 
-
                     openList.add(new PathNode(nx, ny, newG, newH));
-
 
                     parent[nx][ny][0] = cx;
                     parent[nx][ny][1] = cy;
@@ -222,28 +191,21 @@ public class Maze {
             }
         }
 
-
         return pathStack;
     }
-
 
     private static int calculateHeuristic(int x, int y, int targetX, int targetY) {
         return Math.abs(x - targetX) + Math.abs(y - targetY);
     }
 
-
     private static void reconstructPath(int[][][] parent, int x, int y, int startX, int startY, Stack pathStack) {
-
         Stack tempStack = new Stack(maze.length * maze[0].length);
-
 
         int currentX = x;
         int currentY = y;
 
         while (!(currentX == startX && currentY == startY)) {
-
             tempStack.push(new int[]{currentX, currentY});
-
 
             int tempX = parent[currentX][currentY][0];
             int tempY = parent[currentX][currentY][1];
@@ -251,35 +213,54 @@ public class Maze {
             currentY = tempY;
         }
 
-
         while (!tempStack.isEmpty()) {
             pathStack.push(tempStack.pop());
         }
     }
 
 
-    private static class PriorityQueue<T extends Comparable<T>> {
-        private LinkedList<T> list = new LinkedList<>();
+    private static class SimplePriorityQueue {
+        private SingleLinkedList list = new SingleLinkedList();
 
-        public void add(T item) {
-
-            int i = 0;
-            while (i < list.size() && item.compareTo(list.get(i)) > 0) {
-                i++;
+        public void add(PathNode item) {
+            if (list.head == null) {
+                list.addNode(item);
+                return;
             }
-            list.add(i, item);
+
+
+            Node current = list.head;
+            Node previous = null;
+
+            while (current != null &&
+                    item.getF() >= ((PathNode) current.getData()).getF()) {
+                previous = current;
+                current = current.getLink();
+            }
+
+            Node newNode = new Node(item);
+            if (previous == null) {
+
+                newNode.setLink(list.head);
+                list.head = newNode;
+            } else {
+
+                newNode.setLink(current);
+                previous.setLink(newNode);
+            }
         }
 
-        public T poll() {
+        public PathNode poll() {
             if (isEmpty()) return null;
-            return list.removeFirst();
+            PathNode result = (PathNode) list.head.getData();
+            list.head = list.head.getLink();
+            return result;
         }
 
         public boolean isEmpty() {
-            return list.isEmpty();
+            return list.head == null;
         }
     }
-
 
     public static class PathNode implements Comparable<PathNode> {
         private int x;
